@@ -46,16 +46,27 @@
                             <thead>
                                 <tr>
                                     <th>Judul</th>
-                                    <th>Status</th>
-                                    <th>{{ __('labels.general.actions') }}</th>
+                                    <th>Created at</th>
+                                    <th>Update at</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
+                                @forelse($posts as $post)
                                 <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>{{ $post->title }}</td>
+                                    <td>{{ $post->created_at }}</td>
+                                    <td>{{ $post->updated_at }}</td>
+                                    <td>
+                                        <a href="#" class="btn btn-warning">Edit</a>
+                                        <a href="#" class="btn btn-danger">Hapus</a>
+                                    </td>
                                 </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="100%" class="text-center">Data not found</td>
+                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>

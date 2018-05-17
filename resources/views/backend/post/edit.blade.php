@@ -1,173 +1,109 @@
 @extends ('backend.layouts.app')
 
-@section ('title', __('labels.backend.access.users.management') . ' | ' . __('labels.backend.access.users.edit'))
+@section ('title', __('labels.backend.access.users.management') . ' | ' . __('labels.backend.access.users.create'))
 
 @section('breadcrumb-links')
     @include('backend.auth.user.includes.breadcrumb-links')
 @endsection
 
 @section('content')
-{{ html()->modelForm($user, 'PATCH', route('admin.auth.user.update', $user->id))->class('form-horizontal')->open() }}
-    <div class="card">
-        <div class="card-body">
-            <div class="row">
-                <div class="col-sm-5">
-                    <h4 class="card-title mb-0">
-                        {{ __('labels.backend.access.users.management') }}
-                        <small class="text-muted">{{ __('labels.backend.access.users.edit') }}</small>
-                    </h4>
-                </div><!--col-->
-            </div><!--row-->
-
-            <hr />
-
-            <div class="row mt-4 mb-4">
-                <div class="col">
-                    <div class="form-group row">
-                    {{ html()->label(__('validation.attributes.backend.access.users.first_name'))->class('col-md-2 form-control-label')->for('first_name') }}
-
-                        <div class="col-md-10">
-                            {{ html()->text('first_name')
-                                ->class('form-control')
-                                ->placeholder(__('validation.attributes.backend.access.users.first_name'))
-                                ->attribute('maxlength', 191)
-                                ->required() }}
+    {{ html()->form('POST', route('admin.post.store'))->class('form-horizontal')->open() }}
+    <div class="row">
+        <div class="col-sm-8">
+             <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-sm-5">
+                            <h4 class="card-title mb-0">
+                                <label for="">Post Management</label>
+                                <small class="text-muted"><label for="">Post create</label></small>
+                            </h4>
                         </div><!--col-->
-                    </div><!--form-group-->
+                    </div><!--row-->
 
-                    <div class="form-group row">
-                        {{ html()->label(__('validation.attributes.backend.access.users.last_name'))->class('col-md-2 form-control-label')->for('last_name') }}
+                    <hr />
 
-                        <div class="col-md-10">
-                            {{ html()->text('last_name')
-                                ->class('form-control')
-                                ->placeholder(__('validation.attributes.backend.access.users.last_name'))
-                                ->attribute('maxlength', 191)
-                                ->required() }}
+                    <div class="row mt-4 mb-4">
+                        <div class="col">
+                            <div class="form-group">
+                                <input type="text" name="title" class="form-control" placeholder="masukan judul">
+                             <input type="text" name="categories" value="1" hidden>
+                            </div>
+                            <div class="form-group">
+                                <textarea name="content" id="content" name="content" cols="30" rows="10"></textarea>
+                            </div>
+
+                            
                         </div><!--col-->
-                    </div><!--form-group-->
-
-                    <div class="form-group row">
-                        {{ html()->label(__('validation.attributes.backend.access.users.email'))->class('col-md-2 form-control-label')->for('email') }}
-
-                        <div class="col-md-10">
-                            {{ html()->email('email')
-                                ->class('form-control')
-                                ->placeholder(__('validation.attributes.backend.access.users.email'))
-                                ->attribute('maxlength', 191)
-                                ->required() }}
-                        </div><!--col-->
-                    </div><!--form-group-->
-
-                    <div class="form-group row">
-                        {{ html()->label(__('validation.attributes.backend.access.users.timezone'))->class('col-md-2 form-control-label')->for('timezone') }}
-
-                        <div class="col-md-10">
-                            <select name="timezone" id="timezone" class="form-control" required="required">
-                                @foreach (timezone_identifiers_list() as $timezone)
-                                    <option value="{{ $timezone }}" {{ $timezone == $logged_in_user->timezone ? 'selected' : '' }} {{ $timezone == old('timezone') ? ' selected' : '' }}>{{ $timezone }}</option>
-                                @endforeach
-                            </select>
-                        </div><!--col-->
-                    </div><!--form-group-->
-
-                    <div class="form-group row">
-                        {{ html()->label('Abilities')->class('col-md-2 form-control-label') }}
-
-                        <div class="table-responsive col-md-10">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>{{ __('labels.backend.access.users.table.roles') }}</th>
-                                        <th>{{ __('labels.backend.access.users.table.permissions') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            @if ($roles->count())
-                                                @foreach($roles as $role)
-                                                    <div class="card">
-                                                        <div class="card-header">
-                                                            <div class="checkbox">
-                                                                {{ html()->label(
-                                                                        html()->checkbox('roles[]', in_array($role->name, $userRoles), $role->name)
-                                                                              ->class('switch-input')
-                                                                              ->id('role-'.$role->id)
-                                                                        . '<span class="switch-label"></span><span class="switch-handle"></span>')
-                                                                    ->class('switch switch-sm switch-3d switch-primary')
-                                                                    ->for('role-'.$role->id) }}
-                                                                {{ html()->label(ucwords($role->name))->for('role-'.$role->id) }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="card-body">
-                                                            @if ($role->id != 1)
-                                                                @if ($role->permissions->count())
-                                                                    @foreach ($role->permissions as $permission)
-                                                                        <i class="fas fa-dot-circle"></i> {{ ucwords($permission->name) }}
-                                                                    @endforeach
-                                                                @else
-                                                                    {{ __('labels.general.none') }}
-                                                                @endif
-                                                            @else
-                                                                {{ __('labels.backend.access.users.all_permissions') }}
-                                                            @endif
-                                                        </div>
-                                                    </div><!--card-->
-                                                @endforeach
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if ($permissions->count())
-                                                @foreach($permissions as $permission)
-                                                    <div class="checkbox">
-                                                        {{ html()->label(
-                                                                html()->checkbox('permissions[]', in_array($permission->name, $userPermissions), $permission->name)
-                                                                      ->class('switch-input')
-                                                                      ->id('permission-'.$permission->id)
-                                                                . '<span class="switch-label"></span><span class="switch-handle"></span>')
-                                                            ->class('switch switch-sm switch-3d switch-primary')
-                                                            ->for('permission-'.$permission->id) }}
-                                                        {{ html()->label(ucwords($permission->name))->for('permission-'.$permission->id) }}
-                                                    </div>
-                                                @endforeach
-                                            @endif
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div><!--col-->
-                    </div><!--form-group-->
-                </div><!--col-->
-            </div><!--row-->
-        </div><!--card-body-->
-
-        <div class="card-footer">
-            <div class="row">
-                <div class="col">
-                    {{ form_cancel(route('admin.auth.user.index'), __('buttons.general.cancel')) }}
-                </div><!--col-->
-
-                <div class="col text-right">
-                    {{ form_submit(__('buttons.general.crud.update')) }}
-                </div><!--row-->
-            </div><!--row-->
-        </div><!--card-footer-->
-    </div><!--card-->
-{{ html()->closeModelForm() }}
+                    </div><!--row-->
+                </div><!--card-body-->
+            </div><!--card-->
+        </div><!-- col-sm-8 -->
+        <div class="col-sm-4">
+            <div class="card">
+                <div class="card-header">
+                    Publish
+                </div><!-- card-header -->
+                <div class="card-body">
+                    <div>
+                    <button class="btn btn-secondary float-left btn-sm">Save draft</button>
+                    <button class="btn btn-secondary float-right btn-sm">Preview</button>
+                    </div>
+                </div><!-- card-body -->
+                <div class="card-footer">
+                    <div>
+                        <a href="#" class="float-left" style="text-decoration: none;">Move to trash</a>
+                        <button class="btn btn-primary float-right">Publish</button>
+                    </div>
+                </div><!-- card-footer -->
+            </div><!-- card -->
+            <div class="card">
+                <div class="card-header">
+                    Add Image
+                </div>
+                <div class="card-body">
+                    <!-- Dropzone -->
+                    <div action="#" class="dropzone" id="myDropzone">
+                      <div class="fallback">
+                        <input name="file" type="file" multiple />
+                      </div>
+                    </div><!-- dropzone -->
+                </div><!-- card-body -->
+            </div><!-- card -->
+        </div><!-- col-sm-4 -->
+    </div><!-- row -->
+    {{ html()->form()->close() }}
+    @push('after-styles')
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/dropzone.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/basic.css">
+    @endpush
     @push('after-scripts')
-        <script src='https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/dropzone.js'></script>
+        <script src='https://cloud.tinymce.com/stable/tinymce.min.js'></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/dropzone.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/dropzone-amd-module.js"></script>
         <script>
-            var myDropzone = new Dropzone(document, { 
-        thumbnailWidth: 80,
-        thumbnailHeight: 80,
-        parallelUploads: 20,
-  maxFilesize: 1, // membatasi ukuran file yang di upload
-  acceptedFiles: "image/jpg, image/jpeg", // menentukan tipe file yang akan di upload
-        previewTemplate: previewTemplate,
-        autoQueue: false, // Pastikan bahwa file tidak antri sampai ditambahkan secara manual
-        previewsContainer: "#previews", // menentukan elemen untuk menampilkan preview
-        clickable: ".fileinput-button" // menentukan elemen pemicu untuk memilih file
-      });
+            Dropzone.options.myDropzone = {
+                paramName: "file",
+                maxFiles: 1,
+                maxfilesexceeded: function(file) {
+                    this.removeAllFiles();
+                    this.addFile(file);
+                },
+                addRemoveLinks : true,
+                clickable : true,
+                uploadMultiple: false,
+            };
         </script>
+        <script>
+        tinymce.init({
+            selector: "textarea#content",
+            plugins: [
+                "advlist autolink lists link image charmap print preview anchor",
+                "searchreplace visualblocks code fullscreen",
+                "insertdatetime media table contextmenu paste"
+            ],
+            toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
+        });
+        </script>
+    @endpush
 @endsection

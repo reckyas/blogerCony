@@ -7,7 +7,7 @@
 @endsection
 
 @section('content')
-    {{ html()->form('POST', route('admin.auth.user.store'))->class('form-horizontal')->open() }}
+    {{ html()->form('POST', route('admin.post.store'))->class('form-horizontal')->open() }}
     <div class="row">
         <div class="col-sm-8">
              <div class="card">
@@ -26,7 +26,8 @@
                     <div class="row mt-4 mb-4">
                         <div class="col">
                             <div class="form-group">
-                                <input type="text" name="judul" class="form-control" placeholder="masukan judul">
+                                <input type="text" name="title" class="form-control" placeholder="masukan judul">
+                             <input type="text" name="categories" value="1" hidden>
                             </div>
                             <div class="form-group">
                                 <textarea name="content" id="content" name="content" cols="30" rows="10"></textarea>

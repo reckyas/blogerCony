@@ -12,34 +12,32 @@ namespace App\Http\Controllers\Backend\Post;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
-use App\Repositories\Backend\Auth\UserRepository;
-use App\Http\Requests\Backend\Auth\User\ManageUserRequest;
-
+use App\Repositories\Backend\Post\PostRepository;
 class PostController extends Controller
 {
     /**
-     * @var UserRepository
+     * @var postRepository
      */
-    protected $userRepository;
+    protected $postRepository;
 
     /**
      * UserController constructor.
      *
-     * @param UserRepository $userRepository
+     * @param postRepository $postRepository
      */
     
-    public function __construct(UserRepository $userRepository)
+    public function __construct(PostRepository $postRepository)
     {
-        $this->userRepository = $userRepository;
+        $this->postRepository = $postRepository;
     }
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(ManageUserRequest $request)
+    public function index(Request $request)
     {
-        $posts = $this->userRepository;
+        $posts = $this->postRepository;
         
         $limit = ($request->limit && in_array($request->limit, config('options.perpage'))) ? $request->limit : config('options.limitpage');
         if ($request->search) {
@@ -67,7 +65,9 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $this->postRepository->create($request->only('title', 'content'));
+
+        return redirect()->route('admin.post.index')->withFlashSuccess(__('alerts.backend.posts.created'));
     }
 
     /**
